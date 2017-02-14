@@ -55,6 +55,12 @@ import 'core-js/es7/reflect';
  */
 import 'zone.js/dist/zone';  // Included with Angular-CLI.
 
+if (process.env.ENV !== 'build') {
+    require('zone.js/dist/long-stack-trace-zone');
+
+    // configure stackTraceLimit size for debug
+    Error['stackTraceLimit'] = Infinity;
+}
 
 
 /***************************************************************************************************
