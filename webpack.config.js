@@ -21,12 +21,13 @@ module.exports = {
         extensions: ['.ts', '.js', '.json', '.css', '.scss', '.html']
     },
     output: {
-        path: dstRoot,
+        path: path.resolve(__dirname, 'dist'),
         filename: '[name].bundle.js',
+        chunkFilename: '[id].chunk.js'
     },
     devServer: {
-        contentBase: dstRoot,
-        compress: false,
+        contentBase: root(dstRoot),
+        compress: true,
         port: 9000,
         clientLogLevel: "info"
     }, 
@@ -42,7 +43,8 @@ module.exports = {
                 exclude: [/node_modules\/(?!(ng2-.+))/]
             }, {
                 test: /\.html$/,
-                loader: 'html-loader'
+                loader: 'html-loader',
+                include: [root(srcRoot, 'app'), root(srcRoot, 'core')]
             }, {
                 test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/,
                 loader: 'file?name=assets/[name].[hash].[ext]'
@@ -54,13 +56,23 @@ module.exports = {
                 ]
             }
         ]
-    }, 
+    },
     plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                ENV: JSON.stringify(ENV)
+            }
+        }),
         new webpack.optimize.UglifyJsPlugin(),
         new webpack.optimize.CommonsChunkPlugin({
             name: ['app', 'vendor', 'polyfills']
         }),
-        new HtmlWebpackPlugin({template: './src/index.html'})
+        new HtmlWebpackPlugin({
+            template: './src/index.html',
+            chunksSortMode: 'dependency',
+            hash: true,
+            favicon: srcRoot + 'favicon.ico'
+        })
     ]
 };
 
